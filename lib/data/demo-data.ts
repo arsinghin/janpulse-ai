@@ -6,7 +6,7 @@ import { calculatePriorityScore } from '../scoring/priority';
  *
  * DISCLAIMER:
  * These records are synthetic demonstrations generated for the
- * Hack2Skill "Build with AI: Code for Communities" Track 1 prototype.
+ * JanPulse AI Digital Public Infrastructure platform prototype.
  * They do NOT represent actual government data or real citizen identity records.
  */
 

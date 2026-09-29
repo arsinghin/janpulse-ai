@@ -8,9 +8,9 @@ export default function DisclaimerBanner() {
           <Info className="w-3.5 h-3.5 text-amber-700 shrink-0" />
           <p>
             <strong className="font-semibold">Prototype Demonstration Data:</strong> All complaints, cluster
-            metrics, and priority scores are synthetic demonstrations for Hack2Skill{' '}
-            <span className="font-medium underline decoration-amber-400">Build with AI: Code for Communities (Track 1)</span>.
-            Priority scores provide decision support, not official government orders.
+            metrics, and priority scores are synthetic demonstration records for{' '}
+            <span className="font-medium underline decoration-amber-400">JanPulse AI Digital Public Infrastructure</span>.
+            Priority scores provide transparent decision support, not official government orders.
           </p>
         </div>
         <span className="hidden lg:inline text-[11px] font-mono text-amber-700/80 shrink-0">

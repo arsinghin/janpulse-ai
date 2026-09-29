@@ -1,6 +1,9 @@
 {
   "name": "janpulse-ai",
   "version": "0.1.0",
+  "description": "Multilingual Citizen-Signal Intelligence Platform for Digital Public Infrastructure & Governance",
+  "author": "AR Singh",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev",

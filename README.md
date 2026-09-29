@@ -1,225 +1,249 @@
-# JanPulse AI: Multilingual Citizen-Signal Intelligence Platform for India
+# JanPulse AI
 
-> **Tagline:** *From Citizen Voice to Government Action*  
-> **Hackathon Track:** Hack2Skill *Build with AI: Code for Communities — Second Edition* (Track 1: AI for Digital Public Infrastructure & Governance)
+> **From Citizen Voice to Government Action**  
+> *An open-source, AI-powered citizen-signal intelligence layer for Digital Public Infrastructure (DPI) & municipal governance.*
 
----
-
-## 1. Problem Statement
-
-District administrations and urban local bodies across India receive citizen development requests and infrastructure grievances through fragmented channels (helpline numbers, ward visits, physical letters, and citizen portals). 
-
-These requests suffer from three core structural bottlenecks:
-1. **Linguistic Fragmentation:** Citizens submit grievances in multiple Indian languages (Hindi, Tamil, Telugu, Marathi, Bengali, Kannada, English, etc.), which are difficult for single-language municipal departments to aggregate and triage.
-2. **Disconnected Symptoms:** Isolated complaints fail to reveal widespread underlying infrastructure breakdowns (e.g. 35 water complaints across a municipal ward actually stemming from one burst feeder pipeline).
-3. **Subjective Prioritization:** Governments struggle to identify geographic hotspots, urgency, affected populations, and high-priority interventions objectively, frequently reacting to political volume rather than empirical need.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-15.5-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![Google Gen AI SDK](https://img.shields.io/badge/Google_GenAI-Gemini_3.8_Flash-4285F4?logo=google)](https://ai.google.dev/)
+[![Project Owner](https://img.shields.io/badge/Project_Owner-AR_Singh-059669)](https://github.com/)
 
 ---
 
-## 2. Solution: JanPulse AI
+## 1. Executive Summary
 
-**JanPulse AI** operates as a Digital Public Good and an **AI-powered citizen-signal intelligence layer** between citizens and urban local bodies.
+Municipal administrations and urban local bodies across India receive tens of thousands of citizen development requests and infrastructure grievances monthly through fractured silos (portal tickets, handwritten petitions, phone helplines, social media complaints, and in-person ward visits).
 
-* **Multilingual Citizen Signal Ingestion:** Accepts text and browser-based voice input in native Indian languages.
-* **Gemini 3.8 Intelligence Layer:** Automatically identifies language, normalizes colloquial expressions into standardized English summaries, classifies infrastructure domains, and extracts impacted entities.
-* **Geospatial Hotspot Clustering:** Automatically clusters related complaints by geographic proximity, time window, and failure domain.
-* **Deterministic Priority Scoring:** Uses an auditable 5-factor mathematical formula (Volume 30%, Population 25%, Urgency 20%, Trend 15%, Service Gap 10%) so priority decisions remain transparent and non-hallucinated.
-* **Evidence-Backed Government Action Briefs:** Uses Gemini to synthesize empirical citizen evidence into decision-ready action briefs for District Magistrates (DM) and municipal commissioners.
+These workflows suffer from three systemic failure modes:
+1. **Linguistic Fragmentation:** Grievances arrive in diverse Indian languages (Hindi, Tamil, Telugu, Marathi, Bengali, Kannada, Gujarati, English, etc.), preventing single-language municipal departments from triaging converging signals.
+2. **Symptom Isolation:** Complaints are managed as disconnected one-off tickets, masking widespread structural infrastructure failures (e.g. 40 localized water complaints stemming from a single damaged feeder main).
+3. **Subjective Prioritization:** Triage is frequently driven by political escalation rather than objective, auditable metrics of population density, urgency, and essential service gaps.
 
----
-
-## 3. Why JanPulse AI? (Competitive Differentiation)
-
-Unlike generic citizen chatbots or basic complaint ticketing portals:
-* **Intelligence Layer, Not a Chatbot:** JanPulse does not simply chat with citizens; it aggregates fragmented reports into macroscopic municipal intelligence.
-* **Cross-Language Convergence:** A Hindi complaint in Varanasi, a Tamil complaint in Chennai, and an English grievance in Kolkata are analyzed with uniform semantic rigor.
-* **Separation of Concerns:** Gemini performs linguistic comprehension and semantic normalization; deterministic code handles spatial distance and priority math.
-* **Actionable Output:** Instead of raw tickets, administrators receive structured executive Action Briefs citing empirical citizen signals.
+**JanPulse AI** solves this structural bottleneck by acting as an **intelligent citizen-signal aggregation layer** between citizens and governance bodies. It ingests multilingual community voices, performs semantic structuring via Google Gemini, aggregates spatial failure clusters deterministically, calculates transparent priority metrics, and synthesizes evidence-grounded action briefs for district magistrates and municipal engineers.
 
 ---
 
-## 4. Track Alignment: AI for Digital Public Infrastructure & Governance
+## 2. Project Leadership
 
-JanPulse AI directly satisfies the core challenge of **Track 1**:
-1. **Digital Public Good Design:** Open standards, transparent scoring, zero proprietary vendor lock-in, and clear privacy boundaries.
-2. **Citizen Ingestion at Scale:** Multilingual understanding covering 8+ Indian languages across 8 states.
-3. **Actionable Governance:** Bridges the gap between citizen voices and PWD/municipal department engineering interventions.
+* **Project Owner & Lead Architect:** **AR Singh**
+* **License:** [MIT License](LICENSE)
+* **Architecture Philosophy:** Digital Public Good (DPG), open standards, auditable deterministic mathematics, strict privacy preservation, and zero proprietary lock-in.
 
 ---
 
-## 5. AI & System Architecture
+## 3. Core Architectural Paradigm
 
-```text
+JanPulse AI strictly separates **generative AI reasoning** from **deterministic decision logic**:
+
+```
 [ Citizen Ingestion Layer ]
-   Text (Vernacular) / Browser Voice Input
+  * Multilingual vernacular text & browser speech intake
+  * Dialects: Hindi, Tamil, Telugu, Marathi, Bengali, English
                      │
                      ▼
-[ Gemini Understanding & Structuring Layer ]
-   * Language Identification (Hindi, Tamil, Telugu, Marathi, Bengali, English)
-   * Semantic Normalization to Standard English
-   * 10-Domain Infrastructure Categorization
-   * Entity & Vulnerable Group Extraction
-   * Semantic Validation & Range Clamping (lib/ai/validation.ts)
+[ Gemini 3.8 Intelligence Layer ]
+  * Language Identification & Dialect Comprehension
+  * Semantic Normalization to Standard Technical English
+  * 10-Domain Infrastructure Categorization
+  * Entity & Impacted Demographic Extraction
+  * Semantic Range Validation (lib/ai/validation.ts)
                      │
                      ▼
 [ Deterministic Intelligence Layer ]
-   * Spatial Haversine Clustering (45km Radius)
-   * In-Memory / Repository State Aggregation
-   * Multi-Factor Deterministic Priority Scoring (0-100)
+  * Spatial Proximity Grouping (Haversine 45km radius)
+  * Dynamic Cluster Attachment & State Aggregation
+  * Auditable Multi-Factor Priority Equation (0–100)
                      │
                      ▼
-[ Governance & Decision-Support Layer ]
-   * National Geospatial Hotspot Grid (EPSG:7755 Albers Conic Projection)
-   * Hotspot Dossier & Signal Analysis
-   * Grounded Gemini Administrative Action Briefs
+[ Governance Decision-Support Layer ]
+  * Calibrated Geospatial Map (Albers Conic Projection)
+  * Hotspot Intelligence Dossiers with Original Vernacular Quotes
+  * Evidence-Grounded Administrative Action Briefs (Print / PDF)
 ```
 
----
+### Separation of Responsibilities
 
-## 6. Data Architecture
-
-The prototype data model is defined in `lib/types/index.ts`:
-* **`CitizenReport`**: Individual grievance record including raw vernacular text, language, coordinates, category, urgency, and normalized summary.
-* **`InfrastructureHotspot`**: Clustered geospatial aggregation representing recurring failure points with report volume, trend velocity, and affected population estimates.
-* **`PriorityBreakdown`**: Component scores detailing volume, population, urgency, trend, and infrastructure gap.
-* **`ActionBrief`**: Administrative dossier containing problem analysis, evidence tables, intervention areas, and data limitations.
-
----
-
-## 7. Gemini Integration & Prompt Defense
-
-All Gemini API calls are strictly executed **server-side** via Next.js route handlers (`/api/analyze-report` and `/api/generate-action-brief`):
-
-* **Model:** `@google/genai` TypeScript SDK using `gemini-3.8-flash` with automatic fallback to `gemini-flash-latest`.
-* **Prompt Injection Defense:** Strict system instructions declare citizen inputs as untrusted data; overrides and role-play directives are neutralized.
-* **Anti-Hallucination Guardrails:** Output schemas require explicit evidence citing; missing data fields are assigned `null` rather than fabricated.
-* **Semantic Output Validation:** `lib/ai/validation.ts` enforces category whitelists, urgency enums, and bounds confidence between 0.0 and 1.0.
+| Responsibility | Component | Engine / Method |
+| :--- | :--- | :--- |
+| **Vernacular Comprehension** | Language detection, colloquial translation | Google Gemini 3.8 Flash |
+| **Domain Categorization** | Classification into 10 infrastructure sectors | Google Gemini 3.8 Flash |
+| **Output Integrity** | Range clamping, whitelist validation, injection defense | `lib/ai/validation.ts` |
+| **Spatial Clustering** | Geographic proximity & boundary aggregation | Deterministic Haversine Math |
+| **Priority Scoring** | 0–100 auditable decision-support metric | Deterministic 5-Factor Formula |
+| **Action Dossier Drafting** | Synthesis of empirical citizen evidence | Grounded Gemini 3.8 Flash |
 
 ---
 
-## 8. Multilingual Capability
+## 4. Key Capabilities
 
-Demonstrated with native script samples and audio inputs across:
-* **Hindi** (e.g. Varanasi water contamination)
-* **Tamil** (e.g. Chennai GST road cave-ins)
-* **Telugu** (e.g. Warangal rural PHC medicine shortage)
-* **Bengali** (e.g. Kolkata drainage overflow)
-* **Marathi** (e.g. Pune waste disposal crisis)
-* **English** (e.g. Bengaluru public transit route gaps)
+### 4.1 Multilingual Convergence
+Complaints logged in Hindi, Tamil, Telugu, Bengali, Marathi, or English regarding the same infrastructure corridor are recognized as a single converging breakdown. Original citizen voices are preserved in the dossier alongside standardized technical summaries.
 
-The original language is preserved in the database and visible in the admin dossier alongside the English normalized interpretation.
-
----
-
-## 9. Hotspot Detection Engine
-
-Hotspot grouping is deterministic:
-* **Category Match:** Reports must share the same primary infrastructure domain.
-* **Spatial Proximity:** Uses Haversine distance formula to cluster reports within a 45km radius.
-* **Dynamic Attachment:** New citizen submissions dynamically attach to existing clusters, incrementing volume, updating urgency distributions, and refreshing the priority score.
-
----
-
-## 10. Deterministic Priority Methodology
-
-Gemini **never** outputs the final priority score. The priority score (0–100) is calculated via:
+### 4.2 Deterministic Priority Math (No AI Hallucinations)
+Gemini **never** generates numerical priority scores. JanPulse uses an auditable, published equation:
 
 $$\text{Priority Score} = 0.30 \times \text{Volume} + 0.25 \times \text{Population} + 0.20 \times \text{Urgency} + 0.15 \times \text{Trend} + 0.10 \times \text{Service Gap}$$
 
-* **Volume (30%):** Normalized count (caps at 50 reports).
-* **Population (25%):** Normalized affected citizens (caps at 20,000 citizens).
-* **Urgency (20%):** Weighted distribution (Critical=100, High=75, Medium=45, Low=20).
-* **Trend (15%):** Recent recurrence velocity percentage.
-* **Service Gap (10%):** Essential baseline criticality (Water/Healthcare > Secondary).
+* **Volume (30%):** Normalized count (capped at 50 reports).
+* **Population (25%):** Normalized affected demographic (capped at 20,000 citizens).
+* **Urgency (20%):** Severity distribution (Critical: 100, High: 75, Medium: 45, Low: 20).
+* **Trend (15%):** 7-day velocity acceleration percentage.
+* **Service Gap (10%):** Essential service criticality baseline (Drinking Water / Healthcare > Secondary).
+
+### 4.3 Evidence-Grounded Action Briefs
+Produces executive dossiers tailored for District Magistrates (DM), Municipal Commissioners, and Public Works Departments (PWD). Recommendations strictly cite submitted citizen evidence without hallucinated budgets, unverified surveys, or fictitious government orders.
+
+### 4.4 Curated Demonstration Suite
+Includes a built-in evaluation panel with 4 multi-state scenarios:
+* **Hindi:** Severe Drinking Water Pipeline Failure (Varanasi, Uttar Pradesh)
+* **Tamil:** Arterial Road Potholes & Structural Cave-ins (Chennai, Tamil Nadu)
+* **Telugu:** Primary Health Centre Doctor Absence & Drug Stockouts (Warangal, Telangana)
+* **English:** Open Stormwater Drain Blockage & Monsoon Inundation (Kolkata, West Bengal)
 
 ---
 
-## 11. Curated 3-Minute Judge Demo Flow
+## 5. Technology Stack
 
-1. Open the home page (`/`).
-2. Navigate to **"Curated Multilingual Test Scenarios"** (Judge Demo Panel).
-3. Click **"Test This Scenario"** on any card:
-   - **Hindi:** Varanasi Water Pipeline Failure
-   - **Tamil:** Chennai Road Safety & Cave-ins
-   - **Telugu:** Warangal Rural Healthcare PHC Shortage
-   - **English:** Kolkata Monsoon Drainage Inundation
-4. Inspect the real-time Gemini structured analysis:
-   - Detected Language, Category, and English normalization.
-   - Dynamic cluster linkage and updated priority score.
-5. Explore the **Intelligence Dashboard** (`/dashboard`):
-   - Albers Conic projection India map with 8 state hotspots.
-6. Open any **Hotspot Dossier** (`/hotspots/hs-up-varanasi-water`):
-   - Review transparent mathematical formula breakdown.
-7. Click **"Generate Action Brief"** (`/action-brief/hs-up-varanasi-water`):
-   - Inspect grounded administrative briefing with printable PDF styling.
+* **Frontend Framework:** Next.js 15+ (App Router, Server & Client Components)
+* **Language:** TypeScript 5.9 (Strict Type Safety, Zero Implicit Any)
+* **Styling:** Tailwind CSS v4, PostCSS, Lucide Icons
+* **Generative AI SDK:** `@google/genai` (Official modern Google Gen AI TypeScript SDK)
+* **Geospatial Engine:** Lightweight SVG vector renderer using EPSG:7755 (India National Albers Conic projection) — zero external paid mapping keys required
+* **Runtime / Deployment:** Vercel serverless execution & Node.js 18+
 
 ---
 
-## 12. Local Setup & Environment Variables
+## 6. Security & Integrity Engineering
+
+* **Zero Client-Side Key Exposure:** `GEMINI_API_KEY` is strictly confined to server-side route handlers (`/api/*`). No `NEXT_PUBLIC_` prefixes or browser-side token leaks.
+* **Prompt Injection Defense:** System instructions explicitly declare citizen input as untrusted raw data. Directives attempting role-play, administrative overrides, or system prompt leaks are neutralized.
+* **Semantic Output Sanitization:** All model outputs pass through `validateAndSanitizeAIAnalysis` in `lib/ai/validation.ts`, validating category whitelists, urgency enums, and bounding confidence between 0.0 and 1.0.
+* **Network & Proxy Resilience:** `safeFetchJson` validates response MIME types before parsing, gracefully handling HTML gateway timeouts (502/504) without syntax exceptions.
+* **Rate-Limit Resilience:** Dual-tier execution (`gemini-3.8-flash` with fallback to `gemini-flash-latest`) and pre-seeded demonstration fixtures ensure zero downtime during high-concurrency reviews.
+
+---
+
+## 7. API Reference
+
+### `POST /api/analyze-report`
+Ingests unstructured citizen feedback and returns structured intelligence.
+
+**Request Body:**
+```json
+{
+  "text": "हमारे गांव और सिगरा वार्ड में पिछले तीन महीने से पानी की सप्लाई ठीक से नहीं आ रही है।",
+  "state": "Uttar Pradesh",
+  "district": "Varanasi",
+  "locality": "Sigra",
+  "categoryHint": "Water Supply",
+  "isDemo": false
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "analysis": {
+    "detectedLanguage": "Hindi",
+    "normalizedText": "Continuous drinking water supply disruption for over three months...",
+    "category": "Water Supply",
+    "urgency": "Critical",
+    "confidence": 0.95
+  },
+  "report": { "id": "rep-live-104921", "status": "Clustered" },
+  "hotspot": { "id": "hs-up-varanasi-water", "priorityScore": 89 },
+  "priority": { "overallScore": 89 },
+  "source": "gemini"
+}
+```
+
+### `POST /api/generate-action-brief`
+Generates an administrative dossier for a specified hotspot cluster.
+
+**Request Body:**
+```json
+{
+  "hotspotId": "hs-up-varanasi-water"
+}
+```
+
+### `GET /api/hotspots` & `GET /api/metrics`
+Returns aggregated geospatial clusters, filtering parameters, and national infrastructure indicators.
+
+---
+
+## 8. Getting Started
 
 ### Prerequisites
-* Node.js 18+
-* Google Gemini API Key
-
-### Configuration
-Create a `.env.local` file:
-```bash
-# Required Gemini API key (server-side only)
-GEMINI_API_KEY="your_api_key_here"
-
-# Optional Model Configuration
-GEMINI_MODEL="gemini-3.8-flash"
-GEMINI_FALLBACK_MODEL="gemini-flash-latest"
-```
+* Node.js 18.17.0 or higher
+* npm, yarn, or pnpm
+* Google Gemini API Key ([Get a key here](https://aistudio.google.com/))
 
 ### Installation
-```bash
-npm install
-npm run dev
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/janpulse-ai.git
+   cd janpulse-ai
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables:**
+   ```bash
+   cp .env.example .env.local
+   ```
+   Edit `.env.local`:
+   ```env
+   GEMINI_API_KEY="your_actual_gemini_api_key"
+   GEMINI_MODEL="gemini-3.8-flash"
+   GEMINI_FALLBACK_MODEL="gemini-flash-latest"
+   ```
+
+4. **Run development server:**
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:3000` in your browser.
+
+5. **Build for production:**
+   ```bash
+   npm run build
+   npm run start
+   ```
+
+---
+
+## 9. Production Roadmap
+
 ```
-Open `http://localhost:3000`.
-
----
-
-## 13. Vercel Deployment
-
-1. Push code to GitHub.
-2. Import repository into Vercel.
-3. In **Settings > Environment Variables**, add `GEMINI_API_KEY`.
-4. Deploy.
-
----
-
-## 14. Synthetic Data Disclaimer & Data Honesty
-
-All complaint records, citizen names, and population figures in this prototype are **Synthetic Prototype Demonstration Data** created for evaluation in Track 1 of Hack2Skill. They do not represent official government records or actual citizen PII.
-
----
-
-## 15. Known Prototype Limitations
-
-* **In-Memory Volatility:** In the serverless demo environment, newly submitted complaints persist in memory during active server lifecycle but reset upon cold restarts.
-* **Browser Speech Recognition:** Voice intake relies on the Web Speech API (Chrome/Edge/Safari); noisy outdoor environments require server-side ASR (Bhashini).
-* **Spatial Proxies:** Coordinates are calibrated to district municipal centroids rather than high-precision GPS telemetry.
-
----
-
-## 16. Future Google Cloud Architecture (Phase 2 Roadmap)
-
-```text
-[ Ingestion Gateway ] -> Cloud Pub/Sub
-[ Processing ]        -> Cloud Run (Node.js/Next.js)
-[ AI Models ]         -> Gemini 3.8 Flash via Vertex AI
-[ Database ]          -> Google Cloud Firestore (State) & BigQuery (Telemetry)
-[ Identity ]          -> Firebase Auth / DigiLocker Citizen SSO
-[ Geospatial ]        -> Google Maps Platform Geocoding API
-[ Voice ]             -> Bhashini / Cloud Speech-to-Text
+[ Ingestion Gateway ] -> Cloud Pub/Sub / API Gateway
+[ Core Application ]  -> Cloud Run (Next.js App Router)
+[ AI Reasoning ]      -> Gemini 3.8 Flash via Vertex AI
+[ Real-Time State ]   -> Google Cloud Firestore
+[ Geospatial Telemetry] -> Google BigQuery & PostGIS
+[ Official Identity ] -> DigiLocker / Aadhaar Citizen SSO
+[ Field Telemetry ]   -> PWD / Municipal CRM Dispatch Connectors
 ```
 
 ---
 
-## 17. Security & Privacy Considerations
+## 10. Data Disclaimer
 
-* **Zero Client-Side Keys:** `GEMINI_API_KEY` is isolated to server-side API handlers.
-* **No PII Persistence:** Citizen grievance inputs do not harvest phone numbers, Aadhaar numbers, or personal identifying tokens.
-* **Strict Schema Sanitization:** All LLM outputs are validated against type-checked boundary schemas before serialization.
+All complaints, citizen identities, and coordinates presented in this demonstration environment are **Synthetic Demonstration Records** generated for research and design validation of the JanPulse AI platform. They do not represent official government records or actual citizen PII.
+
+---
+
+## 11. License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+```
+Copyright (c) 2026 AR Singh
+```

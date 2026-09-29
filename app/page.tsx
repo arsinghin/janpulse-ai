@@ -90,10 +90,10 @@ export default function HomePage() {
         <section className="relative overflow-hidden bg-white border-b border-slate-200 pt-12 pb-16 lg:pt-16 lg:pb-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-3xl space-y-6">
-              {/* Badge & Track Indicator */}
+              {/* Badge & Initiative Indicator */}
               <div className="inline-flex items-center gap-2 text-xs font-semibold text-blue-800 bg-blue-50 px-3 py-1.5 rounded-md border border-blue-200">
                 <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-                <span>Hack2Skill Track 1: AI for Digital Public Infrastructure</span>
+                <span>AI for Digital Public Infrastructure &amp; Governance</span>
               </div>
 
               {/* Title & Tagline */}
@@ -297,7 +297,9 @@ export default function HomePage() {
           <div>
             <span className="font-bold text-white text-sm">JanPulse AI</span>
             <span className="mx-2 text-slate-600">·</span>
-            <span>Digital Public Infrastructure Prototype for India</span>
+            <span>Digital Public Infrastructure Platform</span>
+            <span className="mx-2 text-slate-600">·</span>
+            <span className="text-slate-400">Project Owner: AR Singh</span>
           </div>
           <div className="flex items-center gap-4 text-[11px]">
             <Link href="/dashboard" className="hover:text-white transition-colors">
@@ -307,7 +309,7 @@ export default function HomePage() {
               Methodology &amp; AI
             </Link>
             <span className="text-slate-600">|</span>
-            <span className="text-slate-500">Hack2Skill: Build with AI</span>
+            <span className="text-slate-400">MIT Licensed Open Source</span>
           </div>
         </div>
       </footer>
