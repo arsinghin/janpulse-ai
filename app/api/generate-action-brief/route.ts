@@ -9,9 +9,13 @@ import { ACTION_BRIEF_SYSTEM_PROMPT, buildActionBriefPrompt } from '@/lib/ai/pro
 import { ACTION_BRIEF_SCHEMA } from '@/lib/ai/schemas';
 import { memoryCache } from '@/lib/ai/cache';
 import { demoDataProvider } from '@/lib/data/data-provider';
-import { ActionBrief, ActionBriefSignal } from '@/lib/types';
+import { ActionBrief, ActionBriefSignal, InfrastructureHotspot, CitizenReport } from '@/lib/types';
+import { generateFallbackActionBrief } from '@/lib/data/demo-analysis';
 
 export async function POST(req: NextRequest) {
+  let hotspot: InfrastructureHotspot | null = null;
+  let linkedReports: CitizenReport[] = [];
+
   try {
     const body = await req.json();
     const { hotspotId } = body;
@@ -24,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. Fetch Hotspot and Linked Reports
-    const hotspot = await demoDataProvider.getHotspotById(hotspotId);
+    hotspot = await demoDataProvider.getHotspotById(hotspotId);
     if (!hotspot) {
       return NextResponse.json(
         { success: false, error: 'NOT_FOUND', message: `Hotspot with ID '${hotspotId}' not found.`, retryable: false },
@@ -44,8 +48,8 @@ export async function POST(req: NextRequest) {
     }
 
     const allReports = await demoDataProvider.getReports();
-    const linkedReports = allReports.filter(
-      (r) => r.clusterId === hotspot.id || hotspot.reportIds.includes(r.id)
+    linkedReports = allReports.filter(
+      (r) => r.clusterId === hotspot!.id || hotspot!.reportIds.includes(r.id)
     );
 
     // 2. Call Gemini for Action Brief with resilient retry and fallback
@@ -83,13 +87,13 @@ export async function POST(req: NextRequest) {
       language: r.language,
       originalSnippet: r.text.length > 180 ? `${r.text.slice(0, 180)}...` : r.text,
       interpretation: r.normalizedText || r.englishSummary || 'Infrastructure report logged.',
-      locality: r.locality || hotspot.district,
+      locality: r.locality || hotspot!.district,
     }));
 
     const brief: ActionBrief = {
-      id: `brief-${hotspot.id}-${Date.now().toString().slice(-4)}`,
-      hotspotId: hotspot.id,
-      title: parsedData.title || `Action Brief: ${hotspot.title}`,
+      id: `brief-${hotspot!.id}-${Date.now().toString().slice(-4)}`,
+      hotspotId: hotspot!.id,
+      title: parsedData.title || `Action Brief: ${hotspot!.title}`,
       generatedAt: new Date().toISOString(),
       modelUsed: source === 'gemini-fallback' ? 'gemini-fallback' : 'gemini-3.8-flash',
       executiveSummary: parsedData.executiveSummary,
@@ -124,6 +128,24 @@ export async function POST(req: NextRequest) {
     console.error(
       `Gemini Action Brief failure [${classified.statusCode} - ${classified.category}]: ${classified.message}`
     );
+
+    // If hotspot was resolved, return a structured fallback Action Brief
+    // so municipal review and prototype demonstration remain fully functional.
+    if (hotspot) {
+      console.warn(
+        `Serving structured fallback Action Brief for hotspot '${hotspot.id}' due to Gemini API status ${classified.statusCode}.`
+      );
+      const fallbackBrief = generateFallbackActionBrief(hotspot, linkedReports);
+      memoryCache.setActionBrief(hotspot.id, fallbackBrief);
+
+      return NextResponse.json({
+        success: true,
+        brief: fallbackBrief,
+        cached: false,
+        source: 'cached-fallback',
+        warning: classified.userFacingMessage,
+      });
+    }
 
     const errorCode =
       classified.category === 'RATE_LIMIT'

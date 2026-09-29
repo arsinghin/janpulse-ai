@@ -13,7 +13,7 @@ export function getGeminiModelName(): string {
 }
 
 export function getGeminiFallbackModelName(): string {
-  return process.env.GEMINI_FALLBACK_MODEL?.trim() || 'gemini-3.6-flash';
+  return process.env.GEMINI_FALLBACK_MODEL?.trim() || 'gemini-flash-latest';
 }
 
 export function getGeminiClient(): GoogleGenAI {
@@ -216,7 +216,7 @@ export function classifyGeminiError(error: unknown): ClassifiedGeminiError {
  */
 export async function withTimeout<T>(
   promise: Promise<T>,
-  timeoutMs: number = 18000,
+  timeoutMs: number = 10000,
   operationName: string = 'Gemini API call'
 ): Promise<T> {
   let timer: NodeJS.Timeout;
@@ -251,8 +251,8 @@ export interface ResilientExecutionResult<T> {
 
 /**
  * Resilient execution wrapper:
- * 1. Tries primary model up to 3 attempts with exponential backoff + jitter for transient failures (503, 500, 504).
- * 2. If primary model fails after 3 attempts, switches to GEMINI_FALLBACK_MODEL and attempts once.
+ * 1. Tries primary model up to 2 attempts with exponential backoff + jitter for transient failures (503, 500, 504).
+ * 2. If primary model fails after 2 attempts, switches to GEMINI_FALLBACK_MODEL and attempts once.
  * 3. Throws GeminiApiFailure if all resilient attempts fail.
  */
 export async function executeGeminiWithRetryAndFallback<T>(
@@ -262,15 +262,15 @@ export async function executeGeminiWithRetryAndFallback<T>(
   const primaryModel = getGeminiModelName();
   const fallbackModel = getGeminiFallbackModelName();
 
-  const MAX_PRIMARY_ATTEMPTS = 3;
+  const MAX_PRIMARY_ATTEMPTS = 2;
   let lastClassified: ClassifiedGeminiError | null = null;
 
-  // 1. Attempt Primary Model with Exponential Backoff
+  // 1. Attempt Primary Model with Backoff
   for (let attempt = 1; attempt <= MAX_PRIMARY_ATTEMPTS; attempt++) {
     try {
       const result = await withTimeout(
         operation(primaryModel),
-        18000,
+        10000,
         `${operationDescription} (${primaryModel} attempt ${attempt})`
       );
       return { result, source: 'gemini' };
@@ -292,10 +292,7 @@ export async function executeGeminiWithRetryAndFallback<T>(
 
       // If transient and we have attempts remaining on primary model:
       if (attempt < MAX_PRIMARY_ATTEMPTS) {
-        // Exponential backoff target: ~1-2s (attempt 1), ~2-4s (attempt 2)
-        const baseDelayMs = attempt === 1 ? 1200 : 2500;
-        const jitterMs = Math.floor(Math.random() * (attempt === 1 ? 600 : 1200));
-        const delayMs = baseDelayMs + jitterMs;
+        const delayMs = 800 + Math.floor(Math.random() * 400);
 
         console.warn(
           `Gemini primary model [${primaryModel}] returned ${lastClassified.statusCode}; retrying attempt ${attempt + 1}/${MAX_PRIMARY_ATTEMPTS} after ${delayMs}ms`
@@ -314,7 +311,7 @@ export async function executeGeminiWithRetryAndFallback<T>(
     try {
       const result = await withTimeout(
         operation(fallbackModel),
-        18000,
+        8000,
         `${operationDescription} (fallback ${fallbackModel})`
       );
       console.info(`Gemini fallback model [${fallbackModel}] succeeded.`);

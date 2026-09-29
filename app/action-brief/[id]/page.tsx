@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import DisclaimerBanner from '@/components/DisclaimerBanner';
 import { ActionBrief, InfrastructureHotspot } from '@/lib/types';
+import { safeFetchJson } from '@/lib/utils/api-client';
 import {
   FileText,
   Printer,
@@ -40,25 +41,25 @@ export default function ActionBriefPage({ params }: ActionBriefPageProps) {
       setError(null);
       try {
         // 1. Fetch hotspot details
-        const hsRes = await fetch(`/api/hotspots/${hotspotId}`);
-        const hsData = await hsRes.json();
-        if (!hsRes.ok || !hsData.success) {
-          throw new Error(hsData.error || 'Failed to fetch hotspot details.');
+        const hsResult = await safeFetchJson<any>(`/api/hotspots/${hotspotId}`);
+        if (!hsResult.ok || !hsResult.data?.success) {
+          throw new Error(hsResult.data?.error || hsResult.error || 'Failed to fetch hotspot details.');
         }
-        setHotspot(hsData.hotspot);
+        setHotspot(hsResult.data.hotspot);
 
         // 2. Generate or fetch Action Brief from Gemini
-        const briefRes = await fetch('/api/generate-action-brief', {
+        const briefResult = await safeFetchJson<any>('/api/generate-action-brief', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ hotspotId }),
         });
-        const briefData = await briefRes.json();
-        if (!briefRes.ok || !briefData.success) {
-          throw new Error(briefData.message || briefData.error || 'Failed to generate Action Brief with Gemini.');
+        if (!briefResult.ok || !briefResult.data?.success) {
+          throw new Error(
+            briefResult.data?.message || briefResult.data?.error || briefResult.error || 'Failed to generate Action Brief.'
+          );
         }
 
-        setBrief(briefData.brief);
+        setBrief(briefResult.data.brief);
       } catch (err: unknown) {
         console.error('Action Brief load error:', err);
         let cleanMsg = 'Gemini Action Brief could not be generated. Please try again in a moment.';

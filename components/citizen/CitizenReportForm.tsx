@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { INDIAN_LOCATIONS, DEFAULT_FALLBACK_LOCATION } from '@/lib/data/indian-locations';
 import { AIReportAnalysis, CitizenReport, InfrastructureHotspot, IssueCategory, PriorityBreakdown } from '@/lib/types';
+import { safeFetchJson } from '@/lib/utils/api-client';
 
 const CATEGORIES: IssueCategory[] = [
   'Water Supply',
@@ -220,7 +221,7 @@ export default function CitizenReportForm() {
     setSubmitError(null);
 
     try {
-      const response = await fetch('/api/analyze-report', {
+      const result = await safeFetchJson<any>('/api/analyze-report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -233,11 +234,11 @@ export default function CitizenReportForm() {
         }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || data.error || 'Gemini is temporarily unavailable. Please try again in a moment.');
+      if (!result.ok || !result.data?.success) {
+        throw new Error(result.data?.message || result.error || 'Gemini is temporarily unavailable. Please try again in a moment.');
       }
+
+      const data = result.data;
 
       setAnalysisResult({
         analysis: data.analysis,

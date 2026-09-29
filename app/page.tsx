@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import DisclaimerBanner from '@/components/DisclaimerBanner';
 import CitizenReportForm from '@/components/citizen/CitizenReportForm';
+import { safeFetchJson } from '@/lib/utils/api-client';
 import {
   Sparkles,
   ArrowRight,
@@ -28,7 +29,7 @@ export default function HomePage() {
     setDemoMessage('Submitting sample Hindi grievance to Gemini...');
 
     try {
-      const response = await fetch('/api/analyze-report', {
+      const result = await safeFetchJson<any>('/api/analyze-report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -41,40 +42,30 @@ export default function HomePage() {
         }),
       });
 
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.message || 'Gemini is temporarily unavailable. Please try again.');
-      }
-
-      if (data.source === 'cached-demo') {
-        setDemoMessage('Gemini is temporarily unavailable. Showing cached prototype analysis.');
-        setTimeout(() => {
-          window.location.href = `/hotspots/${data.hotspot?.id || 'hs-up-varanasi-water'}`;
-        }, 1500);
-      } else {
-        setDemoMessage('Live Gemini analysis completed. Opening hotspot dossier...');
+      if (result.ok && result.data?.success) {
+        const data = result.data;
+        if (data.source === 'cached-demo') {
+          setDemoMessage('Showing cached Varanasi prototype demonstration...');
+        } else {
+          setDemoMessage('Live Gemini analysis completed. Opening hotspot dossier...');
+        }
         setTimeout(() => {
           window.location.href = `/hotspots/${data.hotspot?.id || 'hs-up-varanasi-water'}`;
         }, 900);
+      } else {
+        // Safe fallback for demo mode if server returned an error or non-JSON response
+        console.warn('Demo run notice: Using cached demonstration fallback due to response status', result.status, result.error);
+        setDemoMessage('Showing cached Varanasi prototype demonstration...');
+        setTimeout(() => {
+          window.location.href = '/hotspots/hs-up-varanasi-water';
+        }, 1000);
       }
     } catch (err: unknown) {
-      console.error('Demo run notice:', err);
-      let cleanMsg = 'Gemini is temporarily unavailable. Please try again in a moment.';
-      if (err instanceof Error) {
-        if (err.message.includes('"message":')) {
-          try {
-            const parsed = JSON.parse(err.message);
-            cleanMsg = parsed?.error?.message || parsed?.message || cleanMsg;
-          } catch {
-            cleanMsg = err.message;
-          }
-        } else {
-          cleanMsg = err.message;
-        }
-      }
-      setDemoMessage(cleanMsg);
-      setDemoRunning(false);
+      console.warn('Demo run notice caught exception, falling back to cached demo:', err);
+      setDemoMessage('Showing cached Varanasi prototype demonstration...');
+      setTimeout(() => {
+        window.location.href = '/hotspots/hs-up-varanasi-water';
+      }, 1000);
     }
   };
 

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   getGeminiClient,
+  getGeminiModelName,
+  withTimeout,
   executeGeminiWithRetryAndFallback,
   classifyGeminiError,
   GeminiApiFailure,
@@ -70,13 +72,88 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Check Cache
+    // 2. State & Cache lookup
     const cacheKey = simpleHash(`${trimmedText}_${state}_${district}_${categoryHint || ''}`);
     let analysis: AIReportAnalysis | null = memoryCache.getReportAnalysis(cacheKey);
     let executionSource: 'gemini' | 'gemini-fallback' = 'gemini';
 
+    // 3. Demo Mode Fast Path:
+    // If running in demo mode, prioritize speed. Try a quick 5-second Gemini call;
+    // if that fails, times out, or hits rate limits, immediately return the pre-seeded Varanasi demonstration fixture.
+    if (isDemoRequest) {
+      let demoLiveSucceeded = false;
+      try {
+        const prompt = buildCitizenAnalysisPrompt({
+          text: trimmedText,
+          state,
+          district,
+          locality,
+          categoryHint,
+        });
+
+        const ai = getGeminiClient();
+        const fastResponse = await withTimeout(
+          ai.models.generateContent({
+            model: getGeminiModelName(),
+            contents: prompt,
+            config: {
+              systemInstruction: CITIZEN_ANALYSIS_SYSTEM_PROMPT,
+              responseMimeType: 'application/json',
+              responseSchema: AI_REPORT_ANALYSIS_SCHEMA,
+              temperature: 0.2,
+            },
+          }),
+          5000,
+          'Demo fast analysis'
+        );
+
+        const rawJson = fastResponse.text?.trim();
+        if (rawJson) {
+          analysis = JSON.parse(rawJson) as AIReportAnalysis;
+          executionSource = 'gemini';
+          demoLiveSucceeded = true;
+        }
+      } catch (fastErr) {
+        console.warn('Live Gemini demo attempt bypassed, serving pre-seeded Varanasi fixture:', fastErr);
+      }
+
+      if (!demoLiveSucceeded) {
+        return NextResponse.json({
+          success: true,
+          analysis: DEMO_VARANASI_FIXTURE.analysis,
+          report: {
+            id: `rep-demo-${Date.now().toString().slice(-4)}`,
+            text: trimmedText,
+            language: DEMO_VARANASI_FIXTURE.analysis.detectedLanguage,
+            state: 'Uttar Pradesh',
+            district: 'Varanasi',
+            locality: 'Sigra',
+            coordinates: { lat: 25.3176, lng: 82.9739 },
+            timestamp: new Date().toISOString(),
+            category: DEMO_VARANASI_FIXTURE.analysis.category,
+            urgency: DEMO_VARANASI_FIXTURE.analysis.urgency,
+            affectedGroup: DEMO_VARANASI_FIXTURE.analysis.affectedGroup,
+            estimatedPopulation: DEMO_VARANASI_FIXTURE.analysis.estimatedAffectedPopulation || 14200,
+            status: 'Clustered',
+            clusterId: DEMO_VARANASI_FIXTURE.hotspot.id,
+            normalizedText: DEMO_VARANASI_FIXTURE.analysis.normalizedText,
+            englishSummary: DEMO_VARANASI_FIXTURE.analysis.englishSummary,
+            requestedAction: DEMO_VARANASI_FIXTURE.analysis.requestedAction,
+            aiConfidence: DEMO_VARANASI_FIXTURE.analysis.confidence,
+            keywords: DEMO_VARANASI_FIXTURE.analysis.keywords,
+            isSynthetic: true,
+          },
+          relatedReports: DEMO_VARANASI_FIXTURE.relatedReports,
+          hotspot: DEMO_VARANASI_FIXTURE.hotspot,
+          priority: DEMO_VARANASI_FIXTURE.priority,
+          source: 'cached-demo',
+          warning: 'Showing cached prototype analysis.',
+        });
+      }
+    }
+
     if (!analysis) {
-      // 3. Resilient Call to Gemini with retries and model fallback
+      // 4. Resilient Call to Gemini with retries and model fallback
       const prompt = buildCitizenAnalysisPrompt({
         text: trimmedText,
         state,
