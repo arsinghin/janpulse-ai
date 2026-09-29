@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
-import DisclaimerBanner from '@/components/DisclaimerBanner';
 import CitizenReportForm from '@/components/citizen/CitizenReportForm';
 import JudgeDemoPanel, { CuratedDemoScenario } from '@/components/JudgeDemoPanel';
 import { safeFetchJson } from '@/lib/utils/api-client';
@@ -82,7 +81,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans">
-      <DisclaimerBanner />
       <Navbar />
 
       <main className="flex-1">

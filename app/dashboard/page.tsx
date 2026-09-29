@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
-import DisclaimerBanner from '@/components/DisclaimerBanner';
 import KPICards from '@/components/dashboard/KPICards';
 import IndiaMap from '@/components/map/IndiaMap';
 import HotspotTable from '@/components/dashboard/HotspotTable';
@@ -24,7 +23,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans">
-      <DisclaimerBanner />
       <Navbar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">

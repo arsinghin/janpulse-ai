@@ -1,15 +1,6 @@
 import { CitizenReport, InfrastructureHotspot } from '../types';
 import { calculatePriorityScore } from '../scoring/priority';
 
-/**
- * PROTOTYPE DEMONSTRATION DATA
- *
- * DISCLAIMER:
- * These records are synthetic demonstrations generated for the
- * JanPulse AI Digital Public Infrastructure platform prototype.
- * They do NOT represent actual government data or real citizen identity records.
- */
-
 export const INITIAL_HOTSPOTS: InfrastructureHotspot[] = [
   {
     id: 'hs-up-varanasi-water',

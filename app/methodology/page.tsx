@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
-import DisclaimerBanner from '@/components/DisclaimerBanner';
 import {
   ShieldCheck,
   Cpu,
@@ -20,7 +19,6 @@ import {
 export default function MethodologyPage() {
   return (
     <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans">
-      <DisclaimerBanner />
       <Navbar />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">

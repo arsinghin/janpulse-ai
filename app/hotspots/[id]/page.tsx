@@ -2,7 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-import DisclaimerBanner from '@/components/DisclaimerBanner';
 import { demoDataProvider } from '@/lib/data/data-provider';
 import {
   ArrowLeft,
@@ -39,7 +38,6 @@ export default async function HotspotDetailPage({ params }: HotspotDetailPagePro
 
   return (
     <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans">
-      <DisclaimerBanner />
       <Navbar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">

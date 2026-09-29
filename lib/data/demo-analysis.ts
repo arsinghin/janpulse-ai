@@ -9,13 +9,7 @@ import {
 import { INITIAL_HOTSPOTS, INITIAL_REPORTS } from './demo-data';
 
 /**
- * PROTOTYPE DEMONSTRATION DATA
- *
- * Dedicated deterministic demo fixture for the Varanasi water-supply demonstration.
- * This is used exclusively as a demo fallback when Gemini experiences temporary
- * service unavailability (e.g. HTTP 503 model overload, rate limits, or network timeouts).
- *
- * It is clearly labeled as cached prototype analysis and never represented as live AI.
+ * Cached baseline fixtures for demonstration and offline resiliency.
  */
 
 export const DEMO_VARANASI_ANALYSIS: AIReportAnalysis = {

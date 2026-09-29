@@ -3,7 +3,6 @@
 import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
-import DisclaimerBanner from '@/components/DisclaimerBanner';
 import { ActionBrief, InfrastructureHotspot } from '@/lib/types';
 import { safeFetchJson } from '@/lib/utils/api-client';
 import {
@@ -94,7 +93,6 @@ export default function ActionBriefPage({ params }: ActionBriefPageProps) {
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans print:bg-white">
       {/* Hide on print */}
       <div className="print:hidden">
-        <DisclaimerBanner />
         <Navbar />
       </div>
 
