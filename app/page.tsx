@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import DisclaimerBanner from '@/components/DisclaimerBanner';
 import CitizenReportForm from '@/components/citizen/CitizenReportForm';
+import JudgeDemoPanel, { CuratedDemoScenario } from '@/components/JudgeDemoPanel';
 import { safeFetchJson } from '@/lib/utils/api-client';
 import {
   Sparkles,
@@ -23,6 +24,16 @@ import {
 export default function HomePage() {
   const [demoRunning, setDemoRunning] = useState(false);
   const [demoMessage, setDemoMessage] = useState<string | null>(null);
+  const [selectedDemoScenario, setSelectedDemoScenario] = useState<CuratedDemoScenario | null>(null);
+
+  const handleSelectDemoScenario = (scenario: CuratedDemoScenario) => {
+    setSelectedDemoScenario(scenario);
+    // Smooth scroll down to citizen report form
+    setTimeout(() => {
+      const el = document.getElementById('report-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+  };
 
   const handleRunLiveDemo = async () => {
     setDemoRunning(true);
@@ -209,9 +220,30 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* JUDGE CURATED DEMO SCENARIOS SECTION */}
+        <section className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto -mt-6">
+          <JudgeDemoPanel
+            onSelectScenario={handleSelectDemoScenario}
+            selectedScenarioId={selectedDemoScenario?.id}
+          />
+        </section>
+
         {/* CITIZEN REPORT FORM SECTION */}
-        <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <CitizenReportForm />
+        <section id="report-section" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-6">
+          <CitizenReportForm
+            key={selectedDemoScenario?.id || 'default'}
+            initialPrompt={
+              selectedDemoScenario
+                ? {
+                    text: selectedDemoScenario.text,
+                    state: selectedDemoScenario.state,
+                    district: selectedDemoScenario.district,
+                    locality: selectedDemoScenario.locality,
+                    categoryHint: selectedDemoScenario.category,
+                  }
+                : null
+            }
+          />
         </section>
 
         {/* VALUE PROPOSITION GRID */}

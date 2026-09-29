@@ -95,14 +95,24 @@ const SAMPLE_PROMPTS: SamplePrompt[] = [
   },
 ];
 
-export default function CitizenReportForm() {
+export interface CitizenReportFormProps {
+  initialPrompt?: {
+    text: string;
+    state: string;
+    district: string;
+    locality: string;
+    categoryHint?: string;
+  } | null;
+}
+
+export default function CitizenReportForm({ initialPrompt }: CitizenReportFormProps = {}) {
   const [activeTab, setActiveTab] = useState<'text' | 'voice'>('text');
-  const [complaintText, setComplaintText] = useState('');
-  const [selectedState, setSelectedState] = useState('Uttar Pradesh');
-  const [selectedDistrict, setSelectedDistrict] = useState('Varanasi');
-  const [locality, setLocality] = useState('');
+  const [complaintText, setComplaintText] = useState(initialPrompt?.text || '');
+  const [selectedState, setSelectedState] = useState(initialPrompt?.state || 'Uttar Pradesh');
+  const [selectedDistrict, setSelectedDistrict] = useState(initialPrompt?.district || 'Varanasi');
+  const [locality, setLocality] = useState(initialPrompt?.locality || '');
   const [locationNotKnown, setLocationNotKnown] = useState(false);
-  const [categoryHint, setCategoryHint] = useState<string>('');
+  const [categoryHint, setCategoryHint] = useState<string>(initialPrompt?.categoryHint || '');
 
   // Voice recognition state
   const [isListening, setIsListening] = useState(false);
@@ -230,7 +240,7 @@ export default function CitizenReportForm() {
           district: locationNotKnown ? DEFAULT_FALLBACK_LOCATION.district : selectedDistrict,
           locality: locationNotKnown ? DEFAULT_FALLBACK_LOCATION.locality : locality.trim(),
           categoryHint: categoryHint || undefined,
-          isDemo: false,
+          isDemo: Boolean(initialPrompt),
         }),
       });
 

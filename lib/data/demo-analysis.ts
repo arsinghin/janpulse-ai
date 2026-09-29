@@ -56,6 +56,132 @@ export const DEMO_VARANASI_FIXTURE = {
   warning: 'Gemini is temporarily unavailable. Showing cached prototype analysis.',
 };
 
+// 2. Tamil Nadu Chennai Roads Scenario Fixture
+export const DEMO_CHENNAI_ROAD_ANALYSIS: AIReportAnalysis = {
+  detectedLanguage: 'Tamil',
+  normalizedText:
+    'Major potholes and structural asphalt depressions on GST Road near Tambaram causing frequent two-wheeler accidents and critical school transit delays.',
+  englishSummary:
+    'Severe road potholes and monsoon waterlogging on Tambaram arterial corridor causing traffic hazards and vehicle damage in Chennai.',
+  category: 'Roads & Transport',
+  subcategory: 'Potholes & Structural Road Cavities',
+  problemType: 'Safety hazard',
+  urgency: 'Critical',
+  urgencyReason:
+    'Deep craters submerged under rainwater creating life-safety hazards for two-wheeler commuters and daily school vans.',
+  locationMentioned: 'Tambaram, GST Road, Chennai',
+  affectedGroup: 'Two-wheeler riders, school van drivers, and daily office commuters',
+  estimatedAffectedPopulation: 18500,
+  requestedAction:
+    'Immediate cold-mix bitumen patching and structural resurfacing by Highways & Minor Ports Department.',
+  keywords: ['சாலை', 'குழிகள்', 'தாம்பரம்', 'விபத்து', 'GST Road', 'potholes'],
+  confidence: 0.94,
+};
+
+export const DEMO_CHENNAI_ROAD_HOTSPOT: InfrastructureHotspot = INITIAL_HOTSPOTS[1]; // hs-tn-chennai-roads
+export const DEMO_CHENNAI_ROAD_RELATED = INITIAL_REPORTS.filter((r) => r.clusterId === 'hs-tn-chennai-roads').slice(0, 4);
+
+export const DEMO_CHENNAI_ROAD_FIXTURE = {
+  analysis: DEMO_CHENNAI_ROAD_ANALYSIS,
+  hotspot: DEMO_CHENNAI_ROAD_HOTSPOT,
+  relatedReports: DEMO_CHENNAI_ROAD_RELATED,
+  priority: DEMO_CHENNAI_ROAD_HOTSPOT.priorityBreakdown,
+  source: 'cached-demo' as const,
+  warning: 'Gemini is temporarily unavailable. Showing cached prototype analysis.',
+};
+
+// 3. Telangana Warangal Healthcare Scenario Fixture
+export const DEMO_WARANGAL_HEALTH_ANALYSIS: AIReportAnalysis = {
+  detectedLanguage: 'Telugu',
+  normalizedText:
+    'Primary Health Centre (PHC) in Hanamkonda unstaffed by medical officers for over three weeks with stockout of essential maternal medicines and iron supplements.',
+  englishSummary:
+    'Severe medicine stockout and medical officer absence at rural PHC in Warangal affecting pregnant women and emergency care.',
+  category: 'Healthcare Access',
+  subcategory: 'Essential Drug Stockout & Staff Absence',
+  problemType: 'Service absence',
+  urgency: 'Critical',
+  urgencyReason:
+    'Total absence of emergency duty doctors and critical shortage of maternal iron tablets risking pregnant women health.',
+  locationMentioned: 'Hanamkonda, Warangal',
+  affectedGroup: 'Pregnant mothers, rural patients, and elderly chronic-disease patients',
+  estimatedAffectedPopulation: 9800,
+  requestedAction:
+    'Immediate deputation of medical officer and emergency supply of Schedule-H medicines by District Medical & Health Officer (DMHO).',
+  keywords: ['వైద్యులు', 'మందులు', 'వరంగల్', 'హనుమకొండ', 'PHC', 'healthcare'],
+  confidence: 0.93,
+};
+
+export const DEMO_WARANGAL_HEALTH_HOTSPOT: InfrastructureHotspot = INITIAL_HOTSPOTS[2]; // hs-tg-warangal-health
+export const DEMO_WARANGAL_HEALTH_RELATED = INITIAL_REPORTS.filter((r) => r.clusterId === 'hs-tg-warangal-health').slice(0, 4);
+
+export const DEMO_WARANGAL_HEALTH_FIXTURE = {
+  analysis: DEMO_WARANGAL_HEALTH_ANALYSIS,
+  hotspot: DEMO_WARANGAL_HEALTH_HOTSPOT,
+  relatedReports: DEMO_WARANGAL_HEALTH_RELATED,
+  priority: DEMO_WARANGAL_HEALTH_HOTSPOT.priorityBreakdown,
+  source: 'cached-demo' as const,
+  warning: 'Gemini is temporarily unavailable. Showing cached prototype analysis.',
+};
+
+// 4. West Bengal Kolkata Drainage Scenario Fixture
+export const DEMO_KOLKATA_DRAINAGE_ANALYSIS: AIReportAnalysis = {
+  detectedLanguage: 'English',
+  normalizedText:
+    'Severe stormwater drainage canal blockage in Behala Ward 121 causing contaminated sewage backflow into residential basements and elevated dengue epidemic risk.',
+  englishSummary:
+    'Clogged open stormwater drain overflowing onto residential streets and basements in Behala, Kolkata.',
+  category: 'Drainage & Flooding',
+  subcategory: 'Stormwater Drain Clogging & Sewage Overflow',
+  problemType: 'Infrastructure failure',
+  urgency: 'High',
+  urgencyReason:
+    'Stagnant sewage water accumulated in residential colonies creating acute risk of vector-borne disease outbreak.',
+  locationMentioned: 'Behala Ward 121, Kolkata',
+  affectedGroup: 'Local residents, shopkeepers, and school students in Behala',
+  estimatedAffectedPopulation: 11500,
+  requestedAction:
+    'Deployment of mechanical super-sucker desilting units and anti-larval spray by Kolkata Municipal Corporation (KMC).',
+  keywords: ['drainage', 'flooding', 'Behala', 'sewage', 'Kolkata', 'waterlogging'],
+  confidence: 0.96,
+};
+
+export const DEMO_KOLKATA_DRAINAGE_HOTSPOT: InfrastructureHotspot = INITIAL_HOTSPOTS[4]; // hs-wb-kolkata-drainage
+export const DEMO_KOLKATA_DRAINAGE_RELATED = INITIAL_REPORTS.filter((r) => r.clusterId === 'hs-wb-kolkata-drainage').slice(0, 4);
+
+export const DEMO_KOLKATA_DRAINAGE_FIXTURE = {
+  analysis: DEMO_KOLKATA_DRAINAGE_ANALYSIS,
+  hotspot: DEMO_KOLKATA_DRAINAGE_HOTSPOT,
+  relatedReports: DEMO_KOLKATA_DRAINAGE_RELATED,
+  priority: DEMO_KOLKATA_DRAINAGE_HOTSPOT.priorityBreakdown,
+  source: 'cached-demo' as const,
+  warning: 'Gemini is temporarily unavailable. Showing cached prototype analysis.',
+};
+
+/**
+ * Intelligent fixture selector matching input text, category, or state
+ */
+export function getDemoFixtureForInput(params: {
+  text: string;
+  categoryHint?: string;
+  state?: string;
+}) {
+  const t = params.text.toLowerCase();
+  const c = params.categoryHint?.toLowerCase() || '';
+  const s = params.state?.toLowerCase() || '';
+
+  if (t.includes('தாம்பரம்') || t.includes('குழிகள்') || c.includes('road') || s.includes('tamil')) {
+    return DEMO_CHENNAI_ROAD_FIXTURE;
+  }
+  if (t.includes('వరంగల్') || t.includes('వైద్యులు') || c.includes('health') || s.includes('telangana')) {
+    return DEMO_WARANGAL_HEALTH_FIXTURE;
+  }
+  if (t.includes('behala') || t.includes('drainage') || c.includes('drainage') || s.includes('bengal')) {
+    return DEMO_KOLKATA_DRAINAGE_FIXTURE;
+  }
+  return DEMO_VARANASI_FIXTURE;
+}
+
 export const DEMO_VARANASI_ACTION_BRIEF: ActionBrief = {
   id: 'brief-hs-up-varanasi-water-demo',
   hotspotId: 'hs-up-varanasi-water',

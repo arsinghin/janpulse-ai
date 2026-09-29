@@ -15,22 +15,32 @@ import { assignOrCreateHotspot } from '@/lib/clustering/hotspot';
 import { findDistrictCoordinates } from '@/lib/data/indian-locations';
 import { calculateSingleReportScore } from '@/lib/scoring/priority';
 import { AIReportAnalysis, CitizenReport, IssueCategory, UrgencyLevel } from '@/lib/types';
-import { DEMO_VARANASI_FIXTURE } from '@/lib/data/demo-analysis';
+import { DEMO_VARANASI_FIXTURE, getDemoFixtureForInput } from '@/lib/data/demo-analysis';
+import { validateAndSanitizeAIAnalysis } from '@/lib/ai/validation';
 
 export async function POST(req: NextRequest) {
   let isDemoRequest = false;
   let trimmedText = '';
+  let state = 'Uttar Pradesh';
+  let district = 'Varanasi';
+  let locality = '';
+  let categoryHint: string | undefined = undefined;
 
   try {
     const body = await req.json();
     const {
       text,
-      state = 'Uttar Pradesh',
-      district = 'Varanasi',
-      locality = '',
-      categoryHint,
+      state: bodyState,
+      district: bodyDistrict,
+      locality: bodyLocality,
+      categoryHint: bodyCategoryHint,
       isDemo = false,
     } = body;
+
+    if (bodyState) state = bodyState;
+    if (bodyDistrict) district = bodyDistrict;
+    if (bodyLocality) locality = bodyLocality;
+    if (bodyCategoryHint) categoryHint = bodyCategoryHint;
 
     isDemoRequest = Boolean(isDemo);
 
@@ -109,7 +119,8 @@ export async function POST(req: NextRequest) {
 
         const rawJson = fastResponse.text?.trim();
         if (rawJson) {
-          analysis = JSON.parse(rawJson) as AIReportAnalysis;
+          const rawParsed = JSON.parse(rawJson);
+          analysis = validateAndSanitizeAIAnalysis(rawParsed);
           executionSource = 'gemini';
           demoLiveSucceeded = true;
         }
@@ -118,36 +129,43 @@ export async function POST(req: NextRequest) {
       }
 
       if (!demoLiveSucceeded) {
+        const fixture = getDemoFixtureForInput({
+          text: trimmedText,
+          categoryHint,
+          state,
+        });
+
         return NextResponse.json({
           success: true,
-          analysis: DEMO_VARANASI_FIXTURE.analysis,
+          analysis: fixture.analysis,
           report: {
             id: `rep-demo-${Date.now().toString().slice(-4)}`,
             text: trimmedText,
-            language: DEMO_VARANASI_FIXTURE.analysis.detectedLanguage,
-            state: 'Uttar Pradesh',
-            district: 'Varanasi',
-            locality: 'Sigra',
-            coordinates: { lat: 25.3176, lng: 82.9739 },
+            language: fixture.analysis.detectedLanguage,
+            state: fixture.hotspot.state,
+            district: fixture.hotspot.district,
+            locality: fixture.hotspot.localities[0] || locality || 'District Ward',
+            coordinates: fixture.hotspot.coordinates,
             timestamp: new Date().toISOString(),
-            category: DEMO_VARANASI_FIXTURE.analysis.category,
-            urgency: DEMO_VARANASI_FIXTURE.analysis.urgency,
-            affectedGroup: DEMO_VARANASI_FIXTURE.analysis.affectedGroup,
-            estimatedPopulation: DEMO_VARANASI_FIXTURE.analysis.estimatedAffectedPopulation || 14200,
+            category: fixture.analysis.category,
+            urgency: fixture.analysis.urgency,
+            affectedGroup: fixture.analysis.affectedGroup,
+            estimatedPopulation:
+              fixture.analysis.estimatedAffectedPopulation || fixture.hotspot.estimatedAffectedPopulation,
             status: 'Clustered',
-            clusterId: DEMO_VARANASI_FIXTURE.hotspot.id,
-            normalizedText: DEMO_VARANASI_FIXTURE.analysis.normalizedText,
-            englishSummary: DEMO_VARANASI_FIXTURE.analysis.englishSummary,
-            requestedAction: DEMO_VARANASI_FIXTURE.analysis.requestedAction,
-            aiConfidence: DEMO_VARANASI_FIXTURE.analysis.confidence,
-            keywords: DEMO_VARANASI_FIXTURE.analysis.keywords,
+            clusterId: fixture.hotspot.id,
+            normalizedText: fixture.analysis.normalizedText,
+            englishSummary: fixture.analysis.englishSummary,
+            requestedAction: fixture.analysis.requestedAction,
+            aiConfidence: fixture.analysis.confidence,
+            keywords: fixture.analysis.keywords,
             isSynthetic: true,
           },
-          relatedReports: DEMO_VARANASI_FIXTURE.relatedReports,
-          hotspot: DEMO_VARANASI_FIXTURE.hotspot,
-          priority: DEMO_VARANASI_FIXTURE.priority,
+          relatedReports: fixture.relatedReports,
+          hotspot: fixture.hotspot,
+          priority: fixture.priority,
           source: 'cached-demo',
-          warning: 'Showing cached prototype analysis.',
+          warning: 'Gemini is temporarily unavailable. Showing cached prototype analysis.',
         });
       }
     }
@@ -188,7 +206,8 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      analysis = JSON.parse(rawJson) as AIReportAnalysis;
+      const rawParsed = JSON.parse(rawJson);
+      analysis = validateAndSanitizeAIAnalysis(rawParsed);
 
       // Cache the result
       memoryCache.setReportAnalysis(cacheKey, analysis);
@@ -197,8 +216,12 @@ export async function POST(req: NextRequest) {
     // 4. Coordinates lookup
     const coords = findDistrictCoordinates(state, district);
 
-    // 5. Build CitizenReport
+    // 5. Build CitizenReport with deterministic coordinates offset
     const reportId = `rep-live-${Date.now().toString().slice(-6)}`;
+    const hashStr = simpleHash(trimmedText + (locality || ''));
+    const numVal = hashStr.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+    const deterministicOffset = ((numVal % 100) - 50) * 0.0002;
+
     const newReport: CitizenReport = {
       id: reportId,
       text: trimmedText,
@@ -207,8 +230,8 @@ export async function POST(req: NextRequest) {
       district,
       locality: locality || analysis.locationMentioned || 'District Ward',
       coordinates: {
-        lat: Number((coords.lat + (Math.random() - 0.5) * 0.02).toFixed(4)),
-        lng: Number((coords.lng + (Math.random() - 0.5) * 0.02).toFixed(4)),
+        lat: Number((coords.lat + deterministicOffset).toFixed(4)),
+        lng: Number((coords.lng + deterministicOffset).toFixed(4)),
       },
       timestamp: new Date().toISOString(),
       category: (analysis.category as IssueCategory) || 'Water Supply',
@@ -237,6 +260,9 @@ export async function POST(req: NextRequest) {
     }
     await demoDataProvider.addReport(newReport);
 
+    // Fetch refreshed hotspot reflecting newly aggregated report count & score
+    const updatedHotspot = (await demoDataProvider.getHotspotById(hotspot.id)) || hotspot;
+
     // 7. Find Similar Reports
     const relatedReports = await demoDataProvider.findSimilarReports(
       analysis.normalizedText || trimmedText,
@@ -256,7 +282,7 @@ export async function POST(req: NextRequest) {
       analysis,
       report: newReport,
       relatedReports: relatedReports.filter((r) => r.id !== newReport.id).slice(0, 4),
-      hotspot,
+      hotspot: updatedHotspot,
       priority,
       source: executionSource, // "gemini" | "gemini-fallback"
       isNewHotspot: isNew,
@@ -272,39 +298,46 @@ export async function POST(req: NextRequest) {
     // Return pre-seeded deterministic demo fixture clearly labeled as cached prototype analysis.
     if (isDemoRequest) {
       console.warn(
-        'Demo mode resilience active: Gemini unavailable after retries, serving pre-seeded Varanasi demonstration analysis.'
+        'Demo mode resilience active: Gemini unavailable after retries, serving pre-seeded curated demonstration analysis.'
       );
+
+      const fixture = getDemoFixtureForInput({
+        text: trimmedText,
+        categoryHint,
+        state,
+      });
 
       const demoReport: CitizenReport = {
         id: `rep-demo-${Date.now().toString().slice(-4)}`,
-        text: trimmedText || 'हमारे गांव और सिगरा वार्ड में पिछले तीन महीने से पानी की सप्लाई ठीक से नहीं आ रही है...',
-        language: DEMO_VARANASI_FIXTURE.analysis.detectedLanguage,
-        state: 'Uttar Pradesh',
-        district: 'Varanasi',
-        locality: 'Sigra',
-        coordinates: { lat: 25.3176, lng: 82.9739 },
+        text: trimmedText || 'Sample citizen infrastructure grievance',
+        language: fixture.analysis.detectedLanguage,
+        state: fixture.hotspot.state,
+        district: fixture.hotspot.district,
+        locality: fixture.hotspot.localities[0] || locality || 'District Ward',
+        coordinates: fixture.hotspot.coordinates,
         timestamp: new Date().toISOString(),
-        category: DEMO_VARANASI_FIXTURE.analysis.category,
-        urgency: DEMO_VARANASI_FIXTURE.analysis.urgency,
-        affectedGroup: DEMO_VARANASI_FIXTURE.analysis.affectedGroup,
-        estimatedPopulation: DEMO_VARANASI_FIXTURE.analysis.estimatedAffectedPopulation || 14200,
+        category: fixture.analysis.category,
+        urgency: fixture.analysis.urgency,
+        affectedGroup: fixture.analysis.affectedGroup,
+        estimatedPopulation:
+          fixture.analysis.estimatedAffectedPopulation || fixture.hotspot.estimatedAffectedPopulation,
         status: 'Clustered',
-        clusterId: DEMO_VARANASI_FIXTURE.hotspot.id,
-        normalizedText: DEMO_VARANASI_FIXTURE.analysis.normalizedText,
-        englishSummary: DEMO_VARANASI_FIXTURE.analysis.englishSummary,
-        requestedAction: DEMO_VARANASI_FIXTURE.analysis.requestedAction,
-        aiConfidence: DEMO_VARANASI_FIXTURE.analysis.confidence,
-        keywords: DEMO_VARANASI_FIXTURE.analysis.keywords,
+        clusterId: fixture.hotspot.id,
+        normalizedText: fixture.analysis.normalizedText,
+        englishSummary: fixture.analysis.englishSummary,
+        requestedAction: fixture.analysis.requestedAction,
+        aiConfidence: fixture.analysis.confidence,
+        keywords: fixture.analysis.keywords,
         isSynthetic: true,
       };
 
       return NextResponse.json({
         success: true,
-        analysis: DEMO_VARANASI_FIXTURE.analysis,
+        analysis: fixture.analysis,
         report: demoReport,
-        relatedReports: DEMO_VARANASI_FIXTURE.relatedReports,
-        hotspot: DEMO_VARANASI_FIXTURE.hotspot,
-        priority: DEMO_VARANASI_FIXTURE.priority,
+        relatedReports: fixture.relatedReports,
+        hotspot: fixture.hotspot,
+        priority: fixture.priority,
         source: 'cached-demo',
         warning: 'Gemini is temporarily unavailable. Showing cached prototype analysis.',
       });
