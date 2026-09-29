@@ -1,0 +1,6 @@
+{
+  "name": "JanPulse AI",
+  "description": "Multilingual citizen-signal intelligence platform for India. Transforming fragmented citizen development requests into structured infrastructure intelligence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
